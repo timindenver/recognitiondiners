@@ -460,9 +460,17 @@
   .form-inline {
     display: flex;
     gap: 10px;
-    max-width: 420px;
-    margin: 0 auto;
+    flex-wrap: wrap;
+    justify-content: center;
   }
+  .form-status {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--paper-dim);
+    min-height: 20px;
+  }
+  .form-status.is-error { color: #f4b6b2; }
+  .form-status.is-success { color: #d7e5c3; }
   .form-inline input {
     flex: 1;
     background: var(--card);
@@ -678,10 +686,11 @@
 <section class="final-cta" id="join">
   <h2 class="serif">Your next team dinner is <em>one invite away.</em></h2>
   <p>Join the list and we'll text you the moment a table opens near you.</p>
-  <form class="form-inline" onsubmit="event.preventDefault(); this.querySelector('input').value=''; this.querySelector('button')?.blur();">
-    <input type="email" placeholder="you@company.com" required>
+  <form class="form-inline" id="join-form">
+    <input type="email" name="email" placeholder="you@company.com" autocomplete="email" required>
     <button type="submit" class="btn-primary" style="border:none; cursor:pointer;">Join free</button>
   </form>
+  <div class="form-status" id="join-form-status" aria-live="polite"></div>
 </section>
 
 <footer>
@@ -690,6 +699,46 @@
     <span>Invite-only team dinners, one table at a time.</span>
   </div>
 </footer>
+
+<script>
+  (() => {
+    const form = document.getElementById('join-form');
+    const status = document.getElementById('join-form-status');
+    if (!form || !status) return;
+
+    const button = form.querySelector('button');
+    const input = form.querySelector('input[name="email"]');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      status.textContent = 'Joining...';
+      status.className = 'form-status';
+      if (button) button.disabled = true;
+
+      try {
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: input?.value || '' }),
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.error || 'Something went wrong.');
+        }
+
+        form.reset();
+        status.textContent = payload.message || "You're on the list.";
+        status.className = 'form-status is-success';
+      } catch (error) {
+        status.textContent = error.message || 'Something went wrong. Please try again.';
+        status.className = 'form-status is-error';
+      } finally {
+        if (button) button.disabled = false;
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>
