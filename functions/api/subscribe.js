@@ -28,7 +28,7 @@ export async function onRequestPost(context) {
             Email: email,
             Source: 'recognitiondinners.com website',
             Status: 'active',
-            'Created At': new Date().toISOString(),
+            CreatedAt: new Date().toISOString(),
           },
         },
       ],
