@@ -90,6 +90,25 @@
     position: relative;
     overflow: hidden;
   }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 45%;
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg, var(--ink) 0%, rgba(20,24,31,0.94) 22%, rgba(20,24,31,0.72) 42%, rgba(20,24,31,0.42) 62%, rgba(20,24,31,0.55) 100%),
+      linear-gradient(to top, var(--ink) 0%, rgba(20,24,31,0.15) 18%, rgba(20,24,31,0.1) 82%, var(--ink) 100%);
+  }
   .hero::before {
     content: '';
     position: absolute;
@@ -97,8 +116,9 @@
     right: -200px;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(201,162,75,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(201,162,75,0.10) 0%, transparent 70%);
     pointer-events: none;
+    z-index: 1;
   }
   .hero-grid {
     max-width: 1140px;
@@ -108,6 +128,7 @@
     gap: 64px;
     align-items: center;
     position: relative;
+    z-index: 2;
   }
   .eyebrow {
     display: inline-flex;
@@ -497,6 +518,7 @@
 </nav>
 
 <header class="hero">
+  <div class="hero-bg"><img src="images/hero-reserved.jpg" alt="" role="presentation"></div>
   <div class="hero-grid">
     <div>
       <div class="eyebrow">Invite-only · New drops every two weeks</div>
