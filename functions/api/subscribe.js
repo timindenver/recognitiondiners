@@ -16,7 +16,11 @@ export async function onRequestPost(context) {
       return json({ ok: false, error: 'Please enter a valid work email.' }, 400);
     }
 
-    if (!env.AIRTABLE_API_KEY || !env.AIRTABLE_BASE_ID || !env.AIRTABLE_TABLE_NAME) {
+    const airtableApiKey = env.AIRTABLE_API_KEY;
+    const airtableBaseId = env.AIRTABLE_BASE_ID;
+    const airtableTableName = env.AIRTABLE_TABLE_NAME || env[' AIRTABLE_TABLE_NAME'];
+
+    if (!airtableApiKey || !airtableBaseId || !airtableTableName) {
       return json({ ok: false, error: 'List signup is not fully configured yet.' }, 500);
     }
 
@@ -36,11 +40,11 @@ export async function onRequestPost(context) {
     };
 
     const airtableRes = await fetch(
-      `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent(env.AIRTABLE_TABLE_NAME)}`,
+      `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(airtableTableName)}`,
       {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${env.AIRTABLE_API_KEY}`,
+          Authorization: `Bearer ${airtableApiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
