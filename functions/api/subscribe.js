@@ -14,24 +14,14 @@ function isEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-async function createAirtableRecord({ apiKey, baseId, tableName, emailField, email, sourceField, sourceValue, createdAtField }) {
-  const fields = {
-    [emailField]: email,
-  };
-
-  if (sourceField && sourceValue) fields[sourceField] = sourceValue;
-  if (createdAtField) fields[createdAtField] = new Date().toISOString();
-
-  const response = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}`, {
-    method: 'POST',
+async function airtableRequest({ apiKey, path, method = 'GET', body }) {
+  const response = await fetch(`https://api.airtable.com/v0/${path}`, {
+    method,
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      records: [{ fields }],
-      typecast: true,
-    }),
+    body: body ? JSON.stringify(body) : undefined,
   });
 
   const text = await response.text();
@@ -48,6 +38,32 @@ async function createAirtableRecord({ apiKey, baseId, tableName, emailField, ema
   }
 
   return payload;
+}
+
+async function findAirtableRecordByEmail({ apiKey, baseId, tableName, emailField, email }) {
+  const formula = encodeURIComponent(`LOWER({${emailField}})='${email.replace(/'/g, "\\'")}'`);
+  const path = `${baseId}/${encodeURIComponent(tableName)}?maxRecords=1&fields%5B%5D=${encodeURIComponent(emailField)}&filterByFormula=${formula}`;
+  const payload = await airtableRequest({ apiKey, path });
+  return payload?.records?.[0] || null;
+}
+
+async function createAirtableRecord({ apiKey, baseId, tableName, emailField, email, sourceField, sourceValue, createdAtField }) {
+  const fields = {
+    [emailField]: email,
+  };
+
+  if (sourceField && sourceValue) fields[sourceField] = sourceValue;
+  if (createdAtField) fields[createdAtField] = new Date().toISOString();
+
+  return airtableRequest({
+    apiKey,
+    path: `${baseId}/${encodeURIComponent(tableName)}`,
+    method: 'POST',
+    body: {
+      records: [{ fields }],
+      typecast: true,
+    },
+  });
 }
 
 export async function onRequestPost({ request, env }) {
@@ -69,6 +85,18 @@ export async function onRequestPost({ request, env }) {
 
     if (!isEmail(email)) {
       return json({ ok: false, error: 'Please enter a valid email.' }, 400);
+    }
+
+    const existing = await findAirtableRecordByEmail({
+      apiKey,
+      baseId,
+      tableName,
+      emailField,
+      email,
+    });
+
+    if (existing) {
+      return json({ ok: true, alreadySubscribed: true, message: 'That email is already subscribed.' });
     }
 
     await createAirtableRecord({
