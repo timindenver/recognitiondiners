@@ -543,8 +543,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    gap: 18px;
     color: var(--paper-dim);
+  }
+  .footer-brand {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+  .footer-tagline {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--paper);
   }
 
   /* ---------- RESPONSIVE ---------- */
@@ -651,45 +662,6 @@
   </div>
 </section>
 
-<section id="venues">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-eyebrow">On the list right now</div>
-      <h2 class="serif">A rotating lineup of local favorites.</h2>
-      <p>Every venue is vetted for private-party space and made for a real team dinner — not a stiff conference room lunch.</p>
-    </div>
-    <div class="venue-grid">
-      <div class="venue-card">
-        <span class="venue-tag">Italian</span>
-        <h3 class="serif">The Local House</h3>
-        <p>Wood-fired pasta and a private back room that seats up to fourteen.</p>
-        <div class="venue-meta">
-          <span>Downtown</span>
-          <span class="slots">2 of 3 left</span>
-        </div>
-      </div>
-      <div class="venue-card">
-        <span class="venue-tag">Steakhouse</span>
-        <h3 class="serif">Ember &amp; Oak</h3>
-        <p>A dedicated tasting table with a chef's-choice menu built for groups.</p>
-        <div class="venue-meta">
-          <span>Uptown</span>
-          <span class="slots">1 of 2 left</span>
-        </div>
-      </div>
-      <div class="venue-card">
-        <span class="venue-tag">Gastropub</span>
-        <h3 class="serif">Corner &amp; Vine</h3>
-        <p>Long-table seating, a rotating tap list, and a menu built to share.</p>
-        <div class="venue-meta">
-          <span>Riverside</span>
-          <span class="slots">3 of 3 left</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="perk">
   <div class="wrap">
     <div class="perk-band">
@@ -751,8 +723,8 @@
 
 <footer>
   <div class="footer-inner">
-    <span>Recognition Dinners</span>
-    <span>Invite-only team dinners, one table at a time.</span>
+    <span class="footer-brand">RecognitionDinners.com</span>
+    <span class="footer-tagline">Invite-only team dinners, one table at a time.</span>
   </div>
 </footer>
 

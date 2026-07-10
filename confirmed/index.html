@@ -243,7 +243,16 @@
     align-items: center;
     gap: 18px;
     color: var(--paper-dim);
+  }
+  .footer-brand {
     font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+  .footer-tagline {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--paper);
   }
 
   @media (max-width: 860px) {
@@ -310,8 +319,8 @@
 
 <footer>
   <div class="footer-inner">
-    <span>Recognition Dinners</span>
-    <span>Invite-only team dinners, one table at a time.</span>
+    <span class="footer-brand">RecognitionDinners.com</span>
+    <span class="footer-tagline">Invite-only team dinners, one table at a time.</span>
   </div>
 </footer>
 </body>
