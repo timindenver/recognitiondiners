@@ -18,6 +18,10 @@ function isPhone(phone) {
   return /^[0-9+()\-.\s]{7,25}$/.test(phone);
 }
 
+function isZipCode(zipCode) {
+  return /^\d{5}(?:-\d{4})?$/.test(zipCode);
+}
+
 function cleanText(value) {
   return String(value || '').trim();
 }
@@ -61,6 +65,7 @@ function buildAirtableFields({
   lastNameField,
   phoneField,
   groupSizeField,
+  zipCodeField,
   sourceField,
   sourceValue,
   createdAtField,
@@ -69,6 +74,7 @@ function buildAirtableFields({
   lastName,
   phone,
   groupSize,
+  zipCode,
 }) {
   const fields = {
     [emailField]: email,
@@ -76,6 +82,7 @@ function buildAirtableFields({
     [lastNameField]: lastName,
     [phoneField]: phone,
     [groupSizeField]: groupSize,
+    [zipCodeField]: zipCode,
   };
 
   if (sourceField && sourceValue) fields[sourceField] = sourceValue;
@@ -118,6 +125,7 @@ export async function onRequestPost({ request, env }) {
     const lastNameField = getPlainEnv(env, 'AIRTABLE_LAST_NAME_FIELD') || 'Last Name';
     const phoneField = getPlainEnv(env, 'AIRTABLE_PHONE_FIELD') || 'Best Contact Number';
     const groupSizeField = getPlainEnv(env, 'AIRTABLE_GROUP_SIZE_FIELD') || 'Estimated Group Size';
+    const zipCodeField = getPlainEnv(env, 'AIRTABLE_ZIP_CODE_FIELD') || 'Preferred Zip Code';
     const sourceField = getPlainEnv(env, 'AIRTABLE_SOURCE_FIELD');
     const sourceValue = getPlainEnv(env, 'AIRTABLE_SOURCE_VALUE') || 'recognitiondinners.com';
     const createdAtField = getPlainEnv(env, 'AIRTABLE_CREATED_AT_FIELD');
@@ -131,9 +139,10 @@ export async function onRequestPost({ request, env }) {
     const lastName = cleanText(body?.lastName);
     const phone = cleanText(body?.phone);
     const groupSize = cleanText(body?.groupSize);
+    const zipCode = cleanText(body?.zipCode);
     const email = cleanText(body?.email).toLowerCase();
 
-    if (!firstName || !lastName || !phone || !groupSize) {
+    if (!firstName || !lastName || !phone || !groupSize || !zipCode) {
       return json({ ok: false, error: 'Please complete every field.' }, 400);
     }
 
@@ -149,12 +158,17 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: false, error: 'Please choose an estimated group size.' }, 400);
     }
 
+    if (!isZipCode(zipCode)) {
+      return json({ ok: false, error: 'Please enter a valid zip code.' }, 400);
+    }
+
     const fields = buildAirtableFields({
       emailField,
       firstNameField,
       lastNameField,
       phoneField,
       groupSizeField,
+      zipCodeField,
       sourceField,
       sourceValue,
       createdAtField,
@@ -163,6 +177,7 @@ export async function onRequestPost({ request, env }) {
       lastName,
       phone,
       groupSize,
+      zipCode,
     });
 
     const existing = await findAirtableRecordByEmail({

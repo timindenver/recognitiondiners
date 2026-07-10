@@ -699,6 +699,7 @@
     <input type="text" name="lastName" placeholder="Last name" autocomplete="family-name" required>
     <input type="email" name="email" placeholder="you@company.com" autocomplete="email" required>
     <input type="tel" name="phone" placeholder="Best contact number" autocomplete="tel" required>
+    <input type="text" name="zipCode" placeholder="Preferred zip code for bookings" autocomplete="postal-code" inputmode="numeric" required>
     <select name="groupSize" class="full" required>
       <option value="">Estimated group size for reservations</option>
       <option value="6-10">6-10</option>
@@ -728,6 +729,7 @@
     const lastNameInput = form.querySelector('input[name="lastName"]');
     const emailInput = form.querySelector('input[name="email"]');
     const phoneInput = form.querySelector('input[name="phone"]');
+    const zipCodeInput = form.querySelector('input[name="zipCode"]');
     const groupSizeInput = form.querySelector('select[name="groupSize"]');
 
     form.addEventListener('submit', async (event) => {
@@ -745,6 +747,7 @@
             lastName: lastNameInput?.value || '',
             email: emailInput?.value || '',
             phone: phoneInput?.value || '',
+            zipCode: zipCodeInput?.value || '',
             groupSize: groupSizeInput?.value || '',
           }),
         });
