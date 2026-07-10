@@ -14,6 +14,14 @@ function isEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function isPhone(phone) {
+  return /^[0-9+()\-.\s]{7,25}$/.test(phone);
+}
+
+function cleanText(value) {
+  return String(value || '').trim();
+}
+
 async function airtableRequest({ apiKey, path, method = 'GET', body }) {
   const response = await fetch(`https://api.airtable.com/v0/${path}`, {
     method,
@@ -47,14 +55,36 @@ async function findAirtableRecordByEmail({ apiKey, baseId, tableName, emailField
   return payload?.records?.[0] || null;
 }
 
-async function createAirtableRecord({ apiKey, baseId, tableName, emailField, email, sourceField, sourceValue, createdAtField }) {
+function buildAirtableFields({
+  emailField,
+  firstNameField,
+  lastNameField,
+  phoneField,
+  groupSizeField,
+  sourceField,
+  sourceValue,
+  createdAtField,
+  email,
+  firstName,
+  lastName,
+  phone,
+  groupSize,
+}) {
   const fields = {
     [emailField]: email,
+    [firstNameField]: firstName,
+    [lastNameField]: lastName,
+    [phoneField]: phone,
+    [groupSizeField]: groupSize,
   };
 
   if (sourceField && sourceValue) fields[sourceField] = sourceValue;
   if (createdAtField) fields[createdAtField] = new Date().toISOString();
 
+  return fields;
+}
+
+async function createAirtableRecord({ apiKey, baseId, tableName, fields }) {
   return airtableRequest({
     apiKey,
     path: `${baseId}/${encodeURIComponent(tableName)}`,
@@ -66,12 +96,28 @@ async function createAirtableRecord({ apiKey, baseId, tableName, emailField, ema
   });
 }
 
+async function updateAirtableRecord({ apiKey, baseId, tableName, recordId, fields }) {
+  return airtableRequest({
+    apiKey,
+    path: `${baseId}/${encodeURIComponent(tableName)}/${recordId}`,
+    method: 'PATCH',
+    body: {
+      typecast: true,
+      fields,
+    },
+  });
+}
+
 export async function onRequestPost({ request, env }) {
   try {
     const apiKey = getPlainEnv(env, 'AIRTABLE_API_KEY');
     const baseId = getPlainEnv(env, 'AIRTABLE_BASE_ID');
     const tableName = getPlainEnv(env, 'AIRTABLE_TABLE_NAME');
     const emailField = getPlainEnv(env, 'AIRTABLE_EMAIL_FIELD') || 'Email';
+    const firstNameField = getPlainEnv(env, 'AIRTABLE_FIRST_NAME_FIELD') || 'First Name';
+    const lastNameField = getPlainEnv(env, 'AIRTABLE_LAST_NAME_FIELD') || 'Last Name';
+    const phoneField = getPlainEnv(env, 'AIRTABLE_PHONE_FIELD') || 'Best Contact Number';
+    const groupSizeField = getPlainEnv(env, 'AIRTABLE_GROUP_SIZE_FIELD') || 'Estimated Group Size';
     const sourceField = getPlainEnv(env, 'AIRTABLE_SOURCE_FIELD');
     const sourceValue = getPlainEnv(env, 'AIRTABLE_SOURCE_VALUE') || 'recognitiondinners.com';
     const createdAtField = getPlainEnv(env, 'AIRTABLE_CREATED_AT_FIELD');
@@ -81,11 +127,43 @@ export async function onRequestPost({ request, env }) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const email = String(body?.email || '').trim().toLowerCase();
+    const firstName = cleanText(body?.firstName);
+    const lastName = cleanText(body?.lastName);
+    const phone = cleanText(body?.phone);
+    const groupSize = cleanText(body?.groupSize);
+    const email = cleanText(body?.email).toLowerCase();
+
+    if (!firstName || !lastName || !phone || !groupSize) {
+      return json({ ok: false, error: 'Please complete every field.' }, 400);
+    }
 
     if (!isEmail(email)) {
       return json({ ok: false, error: 'Please enter a valid email.' }, 400);
     }
+
+    if (!isPhone(phone)) {
+      return json({ ok: false, error: 'Please enter a valid contact number.' }, 400);
+    }
+
+    if (!['6-10', '10-16', '16 or more'].includes(groupSize)) {
+      return json({ ok: false, error: 'Please choose an estimated group size.' }, 400);
+    }
+
+    const fields = buildAirtableFields({
+      emailField,
+      firstNameField,
+      lastNameField,
+      phoneField,
+      groupSizeField,
+      sourceField,
+      sourceValue,
+      createdAtField,
+      email,
+      firstName,
+      lastName,
+      phone,
+      groupSize,
+    });
 
     const existing = await findAirtableRecordByEmail({
       apiKey,
@@ -96,18 +174,22 @@ export async function onRequestPost({ request, env }) {
     });
 
     if (existing) {
-      return json({ ok: true, alreadySubscribed: true, message: 'That email is already subscribed.' });
+      await updateAirtableRecord({
+        apiKey,
+        baseId,
+        tableName,
+        recordId: existing.id,
+        fields,
+      });
+
+      return json({ ok: true, alreadySubscribed: true, message: 'That email is already subscribed — we updated your details.' });
     }
 
     await createAirtableRecord({
       apiKey,
       baseId,
       tableName,
-      emailField,
-      email,
-      sourceField,
-      sourceValue,
-      createdAtField,
+      fields,
     });
 
     return json({ ok: true, message: "You're on the list." });

@@ -458,11 +458,14 @@
   .final-cta p { color: var(--paper-dim); font-size: 16px; margin-bottom: 36px; }
 
   .form-inline {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
+    width: min(760px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    text-align: left;
   }
+  .form-inline .full { grid-column: 1 / -1; }
   .form-status {
     margin-top: 14px;
     font-size: 14px;
@@ -471,8 +474,9 @@
   }
   .form-status.is-error { color: #f4b6b2; }
   .form-status.is-success { color: #d7e5c3; }
-  .form-inline input {
-    flex: 1;
+  .form-inline input,
+  .form-inline select {
+    width: 100%;
     background: var(--card);
     border: 0.5px solid var(--line-strong);
     border-radius: 4px;
@@ -482,10 +486,13 @@
     font-family: 'Inter', sans-serif;
   }
   .form-inline input::placeholder { color: var(--paper-dim); }
-  .form-inline input:focus {
+  .form-inline select { appearance: none; }
+  .form-inline input:focus,
+  .form-inline select:focus {
     outline: none;
     border-color: var(--gold);
   }
+  .form-inline button { justify-content: center; width: 100%; }
 
   /* ---------- FOOTER ---------- */
   footer {
@@ -514,7 +521,8 @@
     .how-steps { grid-template-columns: 1fr 1fr; }
     .venue-grid { grid-template-columns: 1fr; }
     .perk-band { grid-template-columns: 1fr; text-align: left; padding: 36px; }
-    .form-inline { flex-direction: column; }
+    .form-inline { grid-template-columns: 1fr; }
+    .form-inline .full { grid-column: auto; }
     .ticket { transform: rotate(0deg); }
     .final-cta h2 { font-size: 30px; }
   }
@@ -687,8 +695,17 @@
   <h2 class="serif">Your next team dinner is <em>one invite away.</em></h2>
   <p>Join the list and we'll text you the moment a table opens near you.</p>
   <form class="form-inline" id="join-form">
+    <input type="text" name="firstName" placeholder="First name" autocomplete="given-name" required>
+    <input type="text" name="lastName" placeholder="Last name" autocomplete="family-name" required>
     <input type="email" name="email" placeholder="you@company.com" autocomplete="email" required>
-    <button type="submit" class="btn-primary" style="border:none; cursor:pointer;">Join free</button>
+    <input type="tel" name="phone" placeholder="Best contact number" autocomplete="tel" required>
+    <select name="groupSize" class="full" required>
+      <option value="">Estimated group size for reservations</option>
+      <option value="6-10">6-10</option>
+      <option value="10-16">10-16</option>
+      <option value="16 or more">16 or more</option>
+    </select>
+    <button type="submit" class="btn-primary full" style="border:none; cursor:pointer;">Join free</button>
   </form>
   <div class="form-status" id="join-form-status" aria-live="polite"></div>
 </section>
@@ -707,7 +724,11 @@
     if (!form || !status) return;
 
     const button = form.querySelector('button');
-    const input = form.querySelector('input[name="email"]');
+    const firstNameInput = form.querySelector('input[name="firstName"]');
+    const lastNameInput = form.querySelector('input[name="lastName"]');
+    const emailInput = form.querySelector('input[name="email"]');
+    const phoneInput = form.querySelector('input[name="phone"]');
+    const groupSizeInput = form.querySelector('select[name="groupSize"]');
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -719,7 +740,13 @@
         const response = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: input?.value || '' }),
+          body: JSON.stringify({
+            firstName: firstNameInput?.value || '',
+            lastName: lastNameInput?.value || '',
+            email: emailInput?.value || '',
+            phone: phoneInput?.value || '',
+            groupSize: groupSizeInput?.value || '',
+          }),
         });
 
         const payload = await response.json();
