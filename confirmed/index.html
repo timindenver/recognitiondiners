@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're on the list. — Recognition Dinners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14181F;
+    --ink-soft: #1D232D;
+    --card: #232A35;
+    --paper: #F5F1E8;
+    --paper-dim: #DCD6C6;
+    --gold: #C9A24B;
+    --gold-bright: #E0BC6E;
+    --sage: #8A9A7A;
+    --line: rgba(245, 241, 232, 0.12);
+    --line-strong: rgba(245, 241, 232, 0.22);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(20, 24, 31, 0.88);
+    backdrop-filter: blur(10px);
+    border-bottom: 0.5px solid var(--line);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 10px 32px;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  .logo img {
+    display: block;
+    height: 116px;
+    width: auto;
+    max-width: min(82vw, 860px);
+  }
+  .nav-cta {
+    border: 0.5px solid var(--line-strong);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all 0.2s ease;
+  }
+  .nav-cta:hover { border-color: var(--gold); color: var(--gold-bright); }
+
+  main {
+    padding: 84px 0 110px;
+  }
+  .hero-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+    gap: 42px;
+    align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-bright);
+    margin-bottom: 24px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sage);
+    box-shadow: 0 0 0 3px rgba(138,154,122,0.2);
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(42px, 6vw, 60px);
+    line-height: 1.04;
+    font-weight: 450;
+    margin-bottom: 22px;
+    letter-spacing: -0.02em;
+  }
+  .lede {
+    font-size: 18px;
+    color: var(--paper-dim);
+    max-width: 560px;
+    margin-bottom: 30px;
+  }
+  .meta-note {
+    font-size: 14px;
+    color: var(--paper-dim);
+  }
+  .actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 28px;
+  }
+  .btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--ink);
+  }
+  .btn-primary:hover { background: var(--gold-bright); transform: translateY(-1px); }
+  .btn-secondary {
+    border: 0.5px solid var(--line-strong);
+    color: var(--paper);
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold-bright); }
+
+  .ticket-panel {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  .ticket-header {
+    padding: 26px 28px 22px;
+    border-bottom: 2px dashed rgba(20,24,31,0.16);
+    position: relative;
+  }
+  .ticket-notch {
+    position: absolute;
+    bottom: -11px;
+    width: 22px;
+    height: 22px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .ticket-notch.left { left: -11px; }
+  .ticket-notch.right { right: -11px; }
+  .ticket-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6B5A1F;
+    margin-bottom: 10px;
+  }
+  .ticket-title {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    line-height: 1.1;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .ticket-subtitle {
+    font-size: 14px;
+    color: #5A5648;
+  }
+  .ticket-body {
+    padding: 24px 28px 28px;
+  }
+  .ticket-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    padding: 14px 0;
+    border-bottom: 0.5px solid rgba(20,24,31,0.12);
+  }
+  .ticket-row:last-child { border-bottom: 0; padding-bottom: 0; }
+  .ticket-row-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #7A7666;
+    font-weight: 700;
+  }
+  .ticket-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #EDE8D8;
+    color: #6B5A1F;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .ticket-perk {
+    margin-top: 18px;
+    background: rgba(138,154,122,0.14);
+    border: 1px solid rgba(95,110,82,0.22);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    color: #435138;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  footer {
+    border-top: 0.5px solid var(--line);
+    padding: 40px 32px;
+  }
+  .footer-inner {
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    color: var(--paper-dim);
+    font-size: 13px;
+  }
+
+  @media (max-width: 860px) {
+    .nav-inner { padding: 10px 20px; }
+    .logo img { height: 92px; }
+    main { padding: 60px 0 90px; }
+    .hero-shell { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo" aria-label="Recognition Dinners home">
+      <img src="/images/logo-black-bg.png" alt="Recognition Dinners">
+    </a>
+    <a href="/#join" class="nav-cta">Back to invites</a>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap hero-shell">
+    <section>
+      <div class="eyebrow">Confirmed · Invite-only access</div>
+      <h1>You’re on the list.</h1>
+      <p class="lede">We’ll text you the moment a table opens near your zip code — usually every one to four weeks. When a reservation window drops, the fastest teams claim the room first.</p>
+      <p class="meta-note">You’ve cleared the last step. Now it’s just a matter of catching the next release before the tables are gone.</p>
+      <div class="actions">
+        <a href="/" class="btn-primary">Return to the site</a>
+        <a href="/#how" class="btn-secondary">See how claims work</a>
+      </div>
+    </section>
+
+    <aside class="ticket-panel" aria-label="Confirmed invite ticket">
+      <div class="ticket-header">
+        <div class="ticket-label">Confirmed ticket stub</div>
+        <div class="ticket-title">Ready for the next drop</div>
+        <div class="ticket-subtitle">Your spot on the notification list is active.</div>
+        <div class="ticket-notch left"></div>
+        <div class="ticket-notch right"></div>
+      </div>
+      <div class="ticket-body">
+        <div class="ticket-row">
+          <span class="ticket-row-label">Status</span>
+          <span class="ticket-pill">✓ Verified</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-row-label">Alert cadence</span>
+          <span>Every 1–4 weeks</span>
+        </div>
+        <div class="ticket-row">
+          <span class="ticket-row-label">Claim window</span>
+          <span>First teams in get the table</span>
+        </div>
+        <div class="ticket-perk">
+          <span>🎟️</span>
+          <span>Each confirmation puts you in line for invite-only restaurant drops built for real team dinners — not generic promo blasts.</span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <span>Recognition Dinners</span>
+    <span>Invite-only team dinners, one table at a time.</span>
+  </div>
+</footer>
+</body>
+</html>
