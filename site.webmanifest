@@ -1,0 +1,15 @@
+{
+  "name": "Recognition Dinners",
+  "short_name": "Recognition Dinners",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#14181F",
+  "theme_color": "#14181F",
+  "icons": [
+    {
+      "src": "/images/logo-black-bg.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
