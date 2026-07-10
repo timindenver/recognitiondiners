@@ -467,13 +467,51 @@
   }
   .form-inline .full { grid-column: 1 / -1; }
   .form-status {
-    margin-top: 14px;
+    margin-top: 16px;
+    padding: 0;
     font-size: 14px;
     color: var(--paper-dim);
     min-height: 20px;
   }
   .form-status.is-error { color: #f4b6b2; }
   .form-status.is-success { color: #d7e5c3; }
+  .form-status.is-pending {
+    color: var(--paper);
+    background: linear-gradient(180deg, rgba(201,162,75,0.2), rgba(201,162,75,0.08));
+    border: 1px solid rgba(201,162,75,0.45);
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: left;
+  }
+  .form-status .status-kicker {
+    display: block;
+    color: var(--gold-bright);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .form-status .status-title {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 4.3vw, 40px);
+    line-height: 1;
+    color: var(--paper);
+    margin-bottom: 12px;
+  }
+  .form-status .status-body {
+    display: block;
+    color: var(--paper);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .form-status .status-tip {
+    display: block;
+    margin-top: 12px;
+    color: var(--paper-dim);
+    font-size: 13.5px;
+  }
   .form-inline input,
   .form-inline select {
     width: 100%;
@@ -693,7 +731,7 @@
 
 <section class="final-cta" id="join">
   <h2 class="serif">Your next team dinner is <em>one invite away.</em></h2>
-  <p>Join the list and we'll text you the moment a table opens near you.</p>
+  <p>Join the list and we'll email you the moment a table opens near you.</p>
   <form class="form-inline" id="join-form">
     <input type="text" name="firstName" placeholder="First name" autocomplete="given-name" required>
     <input type="text" name="lastName" placeholder="Last name" autocomplete="family-name" required>
@@ -758,6 +796,26 @@
         }
 
         form.reset();
+
+        if (payload.awaitingConfirmation) {
+          const safeEmail = String(payload.email || '').replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+          }[char]));
+
+          status.innerHTML = `
+            <span class="status-kicker">Check your inbox</span>
+            <span class="status-title">ONE MORE STEP</span>
+            <span class="status-body">We just sent your confirmation link to <strong>${safeEmail}</strong>. Click that email to finish joining the list.</span>
+            <span class="status-tip">If you don't see it in a minute, check spam or promotions and search for Recognition Dinners.</span>
+          `;
+          status.className = 'form-status is-pending';
+          return;
+        }
+
         status.textContent = payload.message || "You're on the list.";
         status.className = 'form-status is-success';
       } catch (error) {
